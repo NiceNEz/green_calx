@@ -1,0 +1,50 @@
+from flask import Flask, request, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+
+app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost:5432/esp32_db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+class SensorData(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    moisture = db.Column(db.Float, nullable=False)
+    humidity = db.Column(db.Float, nullable=False)
+    temperature = db.Column(db.Float, nullable=False)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'timestamp': self.timestamp,
+            'moisture': self.moisture,
+            'humidity': self.humidity,
+            'temperature': self.temperature,
+        }
+    
+with app.app_context():
+    db.create_all()
+
+@app.route('/data', methods=['POST'])
+def upload_data():
+    content_type = request.headers.get('Content-Type')
+    if content_type != 'application/json':
+        return jsonify({"error": "Content-Type must be application/json"}), 415
+    
+    data = request.json
+    new_data = SensorData(
+        moisture=data['moisture'],
+        humidity=data['humidity'],
+        temperature=data['temperature']
+    )
+    db.session.add(new_data)
+    db.session.commit()
+    return jsonify({"status": "success", "data_saved": new_data.to_dict()}), 201
+
+
+if __name__ == '__main__':
+    # Listen on all network interfaces, allowing the ESP32 to connect to your PC's IP
+    app.run(host='0.0.0.0', port=8080, debug=True)
