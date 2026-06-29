@@ -8,7 +8,7 @@ const char* password = "attblows";
 uint8_t target_bssid[] = {0x24, 0x4B, 0xFE, 0xC7, 0x13, 0xB1};
 int target_channel = 8;
 
-const char* serverUrl = "http://192.168.50.195";
+const char* serverUrl = "http://192.168.50.195:8080/data";
 
 const int MOISTURE_PIN = 2;
 const int SENSOR_POWER = 5;
