@@ -8,7 +8,9 @@ url = "http://localhost:8080/data"
 # Generate and send 5 random readings
 for i in range(5):
     sample_payload = {
+        "stake_id": f"STAKE_TEST_{i:03d}",
         "moisture": round(random.uniform(30.0, 70.0), 2),
+        "lux": round(random.uniform(0.0, 2000.0), 2),
         "humidity": round(random.uniform(40.0, 80.0), 2),
         "temperature": round(random.uniform(18.0, 28.0), 2)
     }

@@ -6,8 +6,8 @@
       "type": "lldb",
       "request": "launch",
       "args": [],
-      "cwd": "/Users/milesnyssen/repos/green-calx/back_end/stake_firmware/src",
-      "program": "/Users/milesnyssen/repos/green-calx/back_end/stake_firmware/src/build/Debug/outDebug"
+      "cwd": "${workspaceFolder}/firmware/src",
+      "program": "${workspaceFolder}/firmware/src/build/Debug/outDebug"
     }
   ]
 }

@@ -12,7 +12,9 @@ db = SQLAlchemy(app)
 class SensorData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    stake_id = db.Column(db.String, nullable=False)
     moisture = db.Column(db.Float, nullable=False)
+    lux = db.Column(db.Float, nullable=False)
     humidity = db.Column(db.Float, nullable=False)
     temperature = db.Column(db.Float, nullable=False)
 
@@ -20,7 +22,9 @@ class SensorData(db.Model):
         return {
             'id': self.id,
             'timestamp': self.timestamp,
+            'stake_id': self.stake_id,
             'moisture': self.moisture,
+            'lux': self.lux,
             'humidity': self.humidity,
             'temperature': self.temperature,
         }
@@ -36,7 +40,9 @@ def upload_data():
     
     data = request.json
     new_data = SensorData(
+        stake_id=data['stake_id'],
         moisture=data['moisture'],
+        lux=data['lux'],
         humidity=data['humidity'],
         temperature=data['temperature']
     )
