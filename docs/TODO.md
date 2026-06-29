@@ -7,11 +7,21 @@ See `docs/DESIGN.md` for architecture context.
 
 - [x] Align firmware ↔ server JSON contract (`stake_id`, `moisture`, `lux`, `temperature`, `humidity`).
 - [x] Fix firmware `serverUrl` to hit `:8080/data` (was POSTing to root on port 80).
-- [ ] **Make WiFi association robust.** Device fails when the hardcoded BSSID/channel isn't in
-      range. Options: fall back to SSID-only connect + scan if BSSID connect fails; log the
-      reason; bound retries with a clear failure path. *(Blocks runtime verification of the URL fix.)*
+- [x] **Make WiFi association robust.** Switched to SSID-only connect (was pinned to BSSID +
+      channel 8, but the omron mesh is on channel 7). Added boot diagnostics: network scan
+      (SSID/channel/RSSI/auth-mode/BSSID), STA MAC print, and a disconnect-reason handler.
+- [ ] **Resolve router-side auth rejection (BLOCKER).** With SSID-only connect the device now
+      finds omron fine (WPA2_PSK, strong signal) but the AP rejects it at the 802.11 auth phase:
+      reason `2` (`AUTH_EXPIRE`), repeating on every retry across multiple mesh BSSIDs. This
+      occurs *before* the password is checked, and the password is confirmed correct — so the
+      cause is router-side, most likely MAC access-control / new-device approval or a per-AP
+      client cap. **Action:** allowlist/approve the ESP32-C3 STA MAC `14:63:93:C6:60:14` in the
+      omron router admin (or run a phone-hotspot test to confirm firmware is good).
+      *(Blocks runtime verification of the URL fix and the full pipeline.)*
 - [ ] **Verify the URL fix end-to-end** once WiFi connects: confirm a real device POST lands in
       `sensor_data` with the firmware's payload (`stake_id=STAKE_C3_001`, raw moisture, etc.).
+- [ ] Guard the boot-time WiFi diagnostics (scan / MAC / reason logging) behind a `DEBUG` flag so
+      production boots stay quiet and fast.
 - [ ] **Re-enable deep sleep** (`esp_deep_sleep_start()` in `main.cpp`) and confirm the
       wake → sense → POST → sleep cycle. Verify `TIME_TO_SLEEP` / `uS_TO_S_FACTOR` produce the
       intended interval.
