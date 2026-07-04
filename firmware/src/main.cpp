@@ -6,7 +6,7 @@
 const char* ssid = "omron";
 const char* password = "attblows";
 
-const char* serverUrl = "http://192.168.50.195:8080/data";
+const char* serverUrl = "http://192.168.50.195:8080/api/data";
 
 const int MOISTURE_PIN = 2;
 const int SENSOR_POWER = 5;
