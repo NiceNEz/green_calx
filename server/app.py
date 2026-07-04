@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+CORS(app, origins=["http://localhost:5173"])
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost:5432/esp32_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -23,7 +23,7 @@ class SensorData(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
-            'timestamp': self.timestamp,
+            'timestamp': self.timestamp.isoformat() + 'Z' if self.timestamp else None,
             'stake_id': self.stake_id,
             'moisture': self.moisture,
             'lux': self.lux,
@@ -52,19 +52,25 @@ def upload_data():
     db.session.commit()
     return jsonify({"status": "success", "data_saved": new_data.to_dict()}), 201
 
-@app.route('/api/readings<stake_id><limit>', methods=['GET'])
-def get_readings(stake_id, limit):
-    data = SensorData.query.filter_by(stake_id=stake_id).order_by(SensorData.timestamp.desc()).limit(limit).all()
-    return jsonify([item.to_dict() for item in data])
+@app.route('/api/readings', methods=['GET'])
+def get_readings():
+    stake_id = request.args.get('stake_id')
+    limit = min(request.args.get('limit', 100, type=int), 1000)
 
-@app.route('api/stakes', methods=['GET'])
+    query = SensorData.query
+    if stake_id:
+        query = query.filter_by(stake_id=stake_id)
+    data = query.order_by(SensorData.timestamp.desc()).limit(limit).all()
+    return jsonify({"status": "success", "readings": [item.to_dict() for item in data]})
+
+@app.route('/api/stakes', methods=['GET'])
 def get_stakes():
-    stakes = SensorData.query.distinct(SensorData.stake_id).order_by(SensorData.stake_id).all()
-    return jsonify([item.to_dict() for item in stakes])
+    rows = db.session.query(SensorData.stake_id).distinct().order_by(SensorData.stake_id).all()
+    return jsonify({"status": "success", "stakes": [row[0] for row in rows]})
 
-@app.route('api/health', methods=['GET'])
+@app.route('/api/health', methods=['GET'])
 def get_health():
-    return jsonify({"status": "healthy"})
+    return jsonify({"status": "success", "message": "API is running"})
 
 if __name__ == '__main__':
     # Listen on all network interfaces, allowing the ESP32 to connect to your PC's IP
