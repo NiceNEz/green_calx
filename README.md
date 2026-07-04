@@ -3,17 +3,20 @@
 A working repository for a plant monitor project called green-calx.
 
 A battery-powered ESP32-C3 stake reads soil/environment sensors, POSTs a JSON reading over WiFi,
-then deep-sleeps; a Flask server receives readings and persists them to PostgreSQL.
+then deep-sleeps; a Flask server receives readings and persists them to PostgreSQL; a React
+dashboard polls the server for live plant telemetry.
 
 - `firmware/` — ESP32-C3 firmware (C++/Arduino, PlatformIO). The battery-powered sensor client.
 - `server/` — Flask HTTP server + database (Python). Receives readings and stores them.
+- `front_end/` — React dashboard (Vite). Reads stakes and sensor history from the API.
 
-See [`docs/DESIGN.md`](docs/DESIGN.md) for architecture and [`docs/TODO.md`](docs/TODO.md) for the roadmap.
+See [`docs/DESIGN.md`](docs/DESIGN.md) for architecture, [`docs/TODO.md`](docs/TODO.md) for the
+roadmap, and [`docs/guides/`](docs/guides/README.md) for component-level walkthroughs.
 
 ## Build & run
 
-green_calx is two independent projects: the **firmware** (compiled/flashed) and the **server**
-(Python — no compile step, just set up and run).
+green_calx is three independent projects: **firmware** (compiled/flashed), **server** (Python),
+and **front_end** (Node/Vite). Run server + frontend together for the full stack.
 
 ### Firmware (`firmware/`)
 
@@ -38,15 +41,26 @@ on first start (`db.create_all()`).
 
 ```bash
 cd server
-source venv/bin/activate           # deps: flask, flask_sqlalchemy, requests
+source venv/bin/activate           # deps: flask, flask-cors, flask_sqlalchemy, requests
 python app.py                      # serves on 0.0.0.0:8080, debug=True
-python test.py                     # (another shell) POSTs 5 random readings to localhost:8080/data
+python test.py                     # (another shell) registers sample plants + POSTs readings
 ```
 
 First-time setup, if the venv or database don't exist yet:
 
 ```bash
 python3 -m venv venv && source venv/bin/activate
-pip install flask flask_sqlalchemy requests
+pip install flask flask-cors flask_sqlalchemy requests
 createdb esp32_db                  # requires postgres running
+```
+
+### Frontend (`front_end/`)
+
+React + Vite dev server. Talks to Flask on `http://localhost:8080` by default (`VITE_API_BASE_URL`
+to override).
+
+```bash
+cd front_end
+npm install
+npm run dev                        # http://localhost:5173
 ```
