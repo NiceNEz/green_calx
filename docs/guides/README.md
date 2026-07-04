@@ -6,6 +6,7 @@ Note-taking guides for each part of the plant-monitor stack. Start with [Data fl
 |-------|----------------|
 | [Data flow](./data-flow.md) | End-to-end path: ESP32 → server → database → dashboard |
 | [App.jsx](./app-jsx.md) | React dashboard: state, polling, UI sections |
+| [useState in App.jsx](./useState-app.jsx.md) | What each `useState` hook does, with `selectedStake` walkthrough |
 | [API client](./api-client.md) | How the frontend talks to Flask (`fetch`, env vars) |
 | [Server API](./server-api.md) | Flask routes, SQLAlchemy models, PostgreSQL |
 | [Firmware](./firmware.md) | ESP32 wake/sense/POST/sleep cycle |

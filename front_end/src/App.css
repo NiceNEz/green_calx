@@ -10,8 +10,78 @@
   margin-bottom: 32px;
 }
 
-.dashboard-header h1 {
-  margin: 0 0 8px;
+.dashboard-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.dashboard-header-row h1 {
+  margin: 0;
+}
+
+.icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 2px solid var(--green-dark);
+  border-radius: 50%;
+  background: var(--yellow-light);
+  color: var(--green-dark);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+  font: inherit;
+}
+
+.icon-button:hover {
+  background: var(--yellow);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(45, 90, 39, 0.15);
+}
+
+.icon-button--add {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.icon-button--add:hover {
+  transform: translateY(-50%) scale(1.05);
+}
+
+.icon-button--remove {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  width: 32px;
+  height: 32px;
+  font-size: 1.25rem;
+  background: #fff;
+}
+
+.icon-button--close {
+  width: 32px;
+  height: 32px;
+  font-size: 1.5rem;
+  border-radius: 8px;
+}
+
+.plant-card-wrap {
+  position: relative;
+}
+
+.plant-card-wrap .plant-card {
+  width: 100%;
 }
 
 .subtitle {
@@ -209,6 +279,93 @@
 
 .readings-table tbody tr:hover {
   background: var(--yellow-light);
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(26, 46, 23, 0.45);
+}
+
+.modal {
+  width: 100%;
+  max-width: 420px;
+  max-height: min(70vh, 480px);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border: 2px solid var(--green);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(45, 90, 39, 0.25);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--green-dark);
+}
+
+.modal-empty {
+  margin: 0;
+  padding: 12px 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.add-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.add-list-item {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 2px solid var(--green-dark);
+  border-radius: 12px;
+  background: var(--yellow-light);
+  color: var(--green-dark);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+  font: inherit;
+  text-align: left;
+}
+
+.add-list-item:hover {
+  background: var(--yellow);
+  transform: translateY(-1px);
+}
+
+.add-list-species {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.add-list-id {
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }
 
 @media (max-width: 640px) {
