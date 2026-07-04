@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 app = Flask(__name__)
+CORS(app, origins=["http://localhost:5173"])
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost:5432/esp32_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -21,7 +23,7 @@ class SensorData(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
-            'timestamp': self.timestamp,
+            'timestamp': self.timestamp.isoformat() + 'Z' if self.timestamp else None,
             'stake_id': self.stake_id,
             'moisture': self.moisture,
             'lux': self.lux,
@@ -32,7 +34,7 @@ class SensorData(db.Model):
 with app.app_context():
     db.create_all()
 
-@app.route('/data', methods=['POST'])
+@app.route('/api/data', methods=['POST'])
 def upload_data():
     content_type = request.headers.get('Content-Type')
     if content_type != 'application/json':
@@ -50,6 +52,25 @@ def upload_data():
     db.session.commit()
     return jsonify({"status": "success", "data_saved": new_data.to_dict()}), 201
 
+@app.route('/api/readings', methods=['GET'])
+def get_readings():
+    stake_id = request.args.get('stake_id')
+    limit = min(request.args.get('limit', 100, type=int), 1000)
+
+    query = SensorData.query
+    if stake_id:
+        query = query.filter_by(stake_id=stake_id)
+    data = query.order_by(SensorData.timestamp.desc()).limit(limit).all()
+    return jsonify({"status": "success", "readings": [item.to_dict() for item in data]})
+
+@app.route('/api/stakes', methods=['GET'])
+def get_stakes():
+    rows = db.session.query(SensorData.stake_id).distinct().order_by(SensorData.stake_id).all()
+    return jsonify({"status": "success", "stakes": [row[0] for row in rows]})
+
+@app.route('/api/health', methods=['GET'])
+def get_health():
+    return jsonify({"status": "success", "message": "API is running"})
 
 if __name__ == '__main__':
     # Listen on all network interfaces, allowing the ESP32 to connect to your PC's IP
